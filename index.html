@@ -1,11 +1,531 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Generador de Facturas POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+        }
+
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .preview-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .logo-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .logo-preview {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            background: white;
+        }
+
+        .logo-preview img {
+            max-width: 90px;
+            max-height: 90px;
+            object-fit: contain;
+        }
+
+        .products-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: 2fr 80px 100px 100px 30px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+
+        .client-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e9f7ff;
+            border-radius: 8px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .invoice-preview {
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            line-height: 1.1;
+            width: 100%;
+            max-width: 280px;
+            background: white;
+            padding: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+
+        .invoice-logo {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .invoice-logo img {
+            max-width: 80px;
+            max-height: 60px;
+            object-fit: contain;
+        }
+
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .invoice-separator {
+            border-top: 1px dashed #333;
+            margin: 8px 0;
+        }
+
+        .invoice-products {
+            margin: 8px 0;
+        }
+
+        .invoice-total-section {
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
+        .invoice-client-section {
+            margin-top: 8px;
+            border-top: 1px dashed #333;
+            padding-top: 8px;
+        }
+
+        .invoice-footer {
+            text-align: center;
+            margin-top: 8px;
+            border-top: 1px dashed #333;
+            padding-top: 8px;
+        }
+
+        .print-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .invoice-preview, .invoice-preview * {
+                visibility: visible;
+            }
+            
+            .invoice-preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 58mm;
+                margin: 0;
+                padding: 2mm;
+                font-size: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-    
+    <div class="container">
+        <div class="form-section">
+            <h2>Generador de Facturas POS</h2>
+            
+            <div class="logo-section">
+                <h3>Logo del Negocio</h3>
+                <label>Cargar Logo (PNG):</label>
+                <input type="file" id="logoFile" accept=".png" onchange="loadLogo()">
+                <div class="logo-preview" id="logoPreview">
+                    Sin logo
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Nombre del Negocio:</label>
+                <input type="text" id="businessName" value="Carniceria Los Compadres" oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Dirección:</label>
+                <input type="text" id="address" value="Calle 7 N 3-88" oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Teléfono:</label>
+                <input type="text" id="phone" value="0 -" oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Atendió:</label>
+                <input type="text" id="attendant" value="Guillermo" oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Fecha:</label>
+                <input type="date" id="invoiceDate" oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Hora:</label>
+                <input type="time" id="invoiceTime" oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>Número de Ticket:</label>
+                <input type="text" id="ticketNumber" value="250514084334" oninput="updatePreview()">
+            </div>
+
+            <div class="products-section">
+                <h3>Productos</h3>
+                <div class="product-row">
+                    <strong>Producto</strong>
+                    <strong>Cant</strong>
+                    <strong>Precio</strong>
+                    <strong>Total</strong>
+                    <strong></strong>
+                </div>
+                <div id="productsContainer">
+                    <div class="product-row">
+                        <input type="text" placeholder="Nombre del producto" oninput="updatePreview()">
+                        <input type="number" value="1" min="1" step="1" oninput="updatePreview()">
+                        <input type="number" step="0.01" placeholder="0.00" oninput="updatePreview()">
+                        <input type="number" step="0.01" readonly>
+                        <button class="btn btn-danger" onclick="removeProduct(this)">×</button>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addProduct()">+ Agregar Producto</button>
+            </div>
+
+            <div class="client-section">
+                <h3>Información del Cliente</h3>
+                <div class="form-group">
+                    <label>Nombre del Cliente:</label>
+                    <input type="text" id="clientName" value="LILIANA - ALEX" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Límite de Crédito:</label>
+                    <input type="number" id="creditLimit" value="0" step="0.01" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Ventas Fiadas:</label>
+                    <input type="number" id="creditSales" value="1" step="1" oninput="updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Deuda Anterior:</label>
+                    <input type="number" id="previousDebt" value="0" step="0.01" oninput="updatePreview()">
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <div class="print-buttons">
+                <button class="btn btn-success" onclick="printInvoice()">🖨️ Imprimir</button>
+                <button class="btn btn-primary" onclick="newInvoice()">📄 Nueva</button>
+            </div>
+            
+            <h3>Vista Previa (58mm)</h3>
+            <div class="invoice-preview" id="invoicePreview">
+                <!-- Vista previa se genera aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let logoDataUrl = null;
+
+        // Cargar logo
+        function loadLogo() {
+            const fileInput = document.getElementById('logoFile');
+            const file = fileInput.files[0];
+            const preview = document.getElementById('logoPreview');
+            
+            if (file && file.type === 'image/png') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    logoDataUrl = e.target.result;
+                    preview.innerHTML = `<img src="${logoDataUrl}" alt="Logo">`;
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                logoDataUrl = null;
+                preview.innerHTML = 'Sin logo';
+                updatePreview();
+            }
+        }
+
+        // Establecer fecha y hora actual
+        function setCurrentDateTime() {
+            const now = new Date();
+            const date = now.toISOString().split('T')[0];
+            const time = now.toTimeString().split(' ')[0].substring(0, 5);
+            
+            document.getElementById('invoiceDate').value = date;
+            document.getElementById('invoiceTime').value = time;
+        }
+
+        // Agregar producto
+        function addProduct() {
+            const container = document.getElementById('productsContainer');
+            const productRow = document.createElement('div');
+            productRow.className = 'product-row';
+            productRow.innerHTML = `
+                <input type="text" placeholder="Nombre del producto" oninput="updatePreview()">
+                <input type="number" value="1" min="1" step="1" oninput="updatePreview()">
+                <input type="number" step="0.01" placeholder="0.00" oninput="updatePreview()">
+                <input type="number" step="0.01" readonly>
+                <button class="btn btn-danger" onclick="removeProduct(this)">×</button>
+            `;
+            container.appendChild(productRow);
+        }
+
+        // Remover producto
+        function removeProduct(button) {
+            const container = document.getElementById('productsContainer');
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+                updatePreview();
+            }
+        }
+
+        // Calcular total de producto
+        function calculateProductTotal(row) {
+            const quantity = parseFloat(row.children[1].value) || 0;
+            const price = parseFloat(row.children[2].value) || 0;
+            const total = quantity * price;
+            row.children[3].value = total.toFixed(0);
+            return total;
+        }
+
+        // Formatear número como moneda
+        function formatCurrency(amount) {
+            return '$' + Math.round(amount).toLocaleString('es-CO');
+        }
+
+        // Actualizar vista previa
+        function updatePreview() {
+            const businessName = document.getElementById('businessName').value || 'Carniceria Los Compadres';
+            const address = document.getElementById('address').value || 'Calle 7 N 3-88';
+            const phone = document.getElementById('phone').value || '0 -';
+            const attendant = document.getElementById('attendant').value || 'Guillermo';
+            const invoiceDate = document.getElementById('invoiceDate').value;
+            const invoiceTime = document.getElementById('invoiceTime').value;
+            const ticketNumber = document.getElementById('ticketNumber').value || '250514084334';
+            const clientName = document.getElementById('clientName').value || 'LILIANA - ALEX';
+            const creditLimit = parseFloat(document.getElementById('creditLimit').value) || 0;
+            const creditSales = parseInt(document.getElementById('creditSales').value) || 1;
+            const previousDebt = parseFloat(document.getElementById('previousDebt').value) || 0;
+
+            // Formatear fecha
+            let formattedDate = '';
+            if (invoiceDate) {
+                const date = new Date(invoiceDate + 'T00:00:00');
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                formattedDate = `${day}-${month}-${year}`;
+            }
+
+            // Formatear hora
+            let formattedTime = invoiceTime;
+            if (invoiceTime) {
+                formattedTime = invoiceTime + ':34';
+            }
+
+            // Calcular productos y total
+            let total = 0;
+            const productRows = document.getElementById('productsContainer').children;
+            let productsHtml = '';
+
+            for (let row of productRows) {
+                const productName = row.children[0].value;
+                const quantity = parseInt(row.children[1].value) || 0;
+                const price = parseFloat(row.children[2].value) || 0;
+                const productTotal = calculateProductTotal(row);
+                total += productTotal;
+
+                if (productName && quantity > 0 && price > 0) {
+                    // Formatear línea de producto con espaciado exacto
+                    const formattedPrice = formatCurrency(price);
+                    const formattedTotal = formatCurrency(productTotal);
+                    const quantityStr = quantity.toString();
+                    
+                    productsHtml += `${productName}\n${quantityStr.padEnd(12)}${formattedPrice.padStart(12)}${formattedTotal.padStart(12)}\n`;
+                }
+            }
+
+            // Calcular deuda total
+            const totalDebt = previousDebt + total;
+
+            // Generar vista previa con formato exacto
+            const preview = document.getElementById('invoicePreview');
+            preview.innerHTML = `${logoDataUrl ? `<div class="invoice-logo"><img src="${logoDataUrl}" alt="Logo"></div>` : ''}
+
+<strong>${businessName}</strong>
+${address}
+${phone}
+Le atendió: ${attendant}
+Fecha: ${formattedDate}, ${formattedTime}
+Núm. ticket: ${ticketNumber}
+
+Producto
+Cantidad          Precio           Total
+------------------------------------------------------
+${productsHtml}
+<strong>TOTAL:                    ${formatCurrency(total)}</strong>
+
+------------------------------------------------------
+
+           <strong>ESTADO DEL CLIENTE</strong>
+
+Cliente: ${clientName}
+Límite crédito: ${formatCurrency(creditLimit)}
+Ventas fiadas: ${creditSales}
+Deuda: ${formatCurrency(totalDebt)}
+
+------------------------------------------------------
+
+       <strong>¡GRACIAS POR SU VISITA!</strong>
+
+                <strong>*** COPIA ***</strong>`;
+        }
+
+        // Imprimir factura
+        function printInvoice() {
+            window.print();
+        }
+
+        // Nueva factura
+        function newInvoice() {
+            // Incrementar número de ticket
+            const currentNumber = parseInt(document.getElementById('ticketNumber').value) || 1;
+            document.getElementById('ticketNumber').value = currentNumber + 1;
+
+            // Limpiar productos
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = `
+                <div class="product-row">
+                    <input type="text" placeholder="Nombre del producto" oninput="updatePreview()">
+                    <input type="number" value="1" min="1" step="1" oninput="updatePreview()">
+                    <input type="number" step="0.01" placeholder="0.00" oninput="updatePreview()">
+                    <input type="number" step="0.01" readonly>
+                    <button class="btn btn-danger" onclick="removeProduct(this)">×</button>
+                </div>
+            `;
+
+            // Actualizar fecha y hora
+            setCurrentDateTime();
+            updatePreview();
+        }
+
+        // Inicializar
+        setCurrentDateTime();
+        updatePreview();
+    </script>
 </body>
 </html>
