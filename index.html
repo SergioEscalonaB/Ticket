@@ -150,7 +150,7 @@
 
         .invoice-preview {
             font-family: 'Courier New', monospace;
-            font-size: 9px;
+            font-size: 15px;
             line-height: 1.1;
             width: 100%;
             max-width: 280px;
@@ -455,7 +455,7 @@
                     const formattedTotal = formatCurrency(productTotal);
                     const quantityStr = quantity.toString();
                     
-                    productsHtml += `${productName}\n${quantityStr.padEnd(12)}${formattedPrice.padStart(12)}${formattedTotal.padStart(12)}\n`;
+                    productsHtml += `${productName}\n${quantityStr.padEnd(7)}${formattedPrice.padStart(11)}${formattedTotal.padStart(11)}\n`;
                 }
             }
 
@@ -474,25 +474,25 @@ Fecha: ${formattedDate}, ${formattedTime}
 Núm. ticket: ${ticketNumber}
 
 Producto
-Cantidad          Precio           Total
-------------------------------------------------
+Cantidad    Precio    Total
+-----------------------------
 ${productsHtml}
-<strong>TOTAL:                               ${formatCurrency(total)}</strong>
+<strong>TOTAL:              ${formatCurrency(total)}</strong>
 
-------------------------------------------------
+-----------------------------
 
-           <strong>   ESTADO DEL CLIENTE</strong>
+    <strong> ESTADO DEL CLIENTE</strong>
 
 Cliente: ${clientName}
 Límite crédito: ${formatCurrency(creditLimit)}
 Ventas fiadas: ${creditSales}
 Deuda: ${formatCurrency(totalDebt)}
 
-------------------------------------------------
+-----------------------------
 
-       <strong>     ¡GRACIAS POR SU VISITA!</strong>
+<strong>   ¡GRACIAS POR SU VISITA!</strong>
 
-                <strong> *** COPIA ***</strong>`;
+    <strong>    *** COPIA ***</strong>`;
         }
 
         // Imprimir factura
