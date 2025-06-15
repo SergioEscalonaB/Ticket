@@ -292,7 +292,7 @@
                 <div id="productsContainer">
                     <div class="product-row">
                         <input type="text" placeholder="Nombre del producto" oninput="updatePreview()">
-                        <input type="number" value="1" min="1" step="1" oninput="updatePreview()">
+                        <input type="number" value="1" min="0.01" step="0.01" oninput="updatePreview()">
                         <input type="number" step="0.01" placeholder="0.00" oninput="updatePreview()">
                         <input type="number" step="0.01" readonly>
                         <button class="btn btn-danger" onclick="removeProduct(this)">×</button>
@@ -376,7 +376,7 @@
             productRow.className = 'product-row';
             productRow.innerHTML = `
                 <input type="text" placeholder="Nombre del producto" oninput="updatePreview()">
-                <input type="number" value="1" min="1" step="1" oninput="updatePreview()">
+                <input type="number" value="1" min="0.01" step="0.01" oninput="updatePreview()">
                 <input type="number" step="0.01" placeholder="0.00" oninput="updatePreview()">
                 <input type="number" step="0.01" readonly>
                 <button class="btn btn-danger" onclick="removeProduct(this)">×</button>
@@ -421,7 +421,7 @@
             const creditSales = parseInt(document.getElementById('creditSales').value) || 1;
             const previousDebt = parseFloat(document.getElementById('previousDebt').value) || 0;
 
-            // Formatear fecha
+            // Formatear fecha  
             let formattedDate = '';
             if (invoiceDate) {
                 const date = new Date(invoiceDate + 'T00:00:00');
@@ -444,7 +444,7 @@
 
             for (let row of productRows) {
                 const productName = row.children[0].value;
-                const quantity = parseInt(row.children[1].value) || 0;
+                const quantity = parseFloat(row.children[1].value) || 0;
                 const price = parseFloat(row.children[2].value) || 0;
                 const productTotal = calculateProductTotal(row);
                 total += productTotal;
@@ -475,24 +475,24 @@ Núm. ticket: ${ticketNumber}
 
 Producto
 Cantidad          Precio           Total
-------------------------------------------------------
+------------------------------------------------
 ${productsHtml}
-<strong>TOTAL:                    ${formatCurrency(total)}</strong>
+<strong>TOTAL:                               ${formatCurrency(total)}</strong>
 
-------------------------------------------------------
+------------------------------------------------
 
-           <strong>ESTADO DEL CLIENTE</strong>
+           <strong>   ESTADO DEL CLIENTE</strong>
 
 Cliente: ${clientName}
 Límite crédito: ${formatCurrency(creditLimit)}
 Ventas fiadas: ${creditSales}
 Deuda: ${formatCurrency(totalDebt)}
 
-------------------------------------------------------
+------------------------------------------------
 
-       <strong>¡GRACIAS POR SU VISITA!</strong>
+       <strong>     ¡GRACIAS POR SU VISITA!</strong>
 
-                <strong>*** COPIA ***</strong>`;
+                <strong> *** COPIA ***</strong>`;
         }
 
         // Imprimir factura
