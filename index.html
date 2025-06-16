@@ -163,12 +163,12 @@
 
         .invoice-logo {
             text-align: center;
-            margin-bottom: 8px;
+            margin-bottom: -15px;
         }
 
         .invoice-logo img {
-            max-width: 80px;
-            max-height: 60px;
+            max-width: 180px;
+            max-height: 50px;
             object-fit: contain;
         }
 
@@ -235,16 +235,16 @@
     <div class="container">
         <div class="form-section">
             <h2>Generador de Facturas POS</h2>
-            
+
+            <!-- Mostrar logo directamente -->
             <div class="logo-section">
                 <h3>Logo del Negocio</h3>
-                <label>Cargar Logo (PNG):</label>
-                <input type="file" id="logoFile" accept=".png" onchange="loadLogo()">
                 <div class="logo-preview" id="logoPreview">
-                    Sin logo
+                    <img src="Logo.png" alt="Logo" />  <!-- Aca se coloca la ruta del logo -->
                 </div>
             </div>
 
+            <!-- Aquí sigue todo igual -->
             <div class="form-group">
                 <label>Nombre del Negocio:</label>
                 <input type="text" id="businessName" value="Carniceria Los Compadres" oninput="updatePreview()">
@@ -327,7 +327,7 @@
                 <button class="btn btn-success" onclick="printInvoice()">🖨️ Imprimir</button>
                 <button class="btn btn-primary" onclick="newInvoice()">📄 Nueva</button>
             </div>
-            
+
             <h3>Vista Previa (58mm)</h3>
             <div class="invoice-preview" id="invoicePreview">
                 <!-- Vista previa se genera aquí -->
@@ -336,35 +336,12 @@
     </div>
 
     <script>
-        let logoDataUrl = null;
-
-        // Cargar logo
-        function loadLogo() {
-            const fileInput = document.getElementById('logoFile');
-            const file = fileInput.files[0];
-            const preview = document.getElementById('logoPreview');
-            
-            if (file && file.type === 'image/png') {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    logoDataUrl = e.target.result;
-                    preview.innerHTML = `<img src="${logoDataUrl}" alt="Logo">`;
-                    updatePreview();
-                };
-                reader.readAsDataURL(file);
-            } else {
-                logoDataUrl = null;
-                preview.innerHTML = 'Sin logo';
-                updatePreview();
-            }
-        }
-
         // Establecer fecha y hora actual
         function setCurrentDateTime() {
             const now = new Date();
             const date = now.toISOString().split('T')[0];
             const time = now.toTimeString().split(' ')[0].substring(0, 5);
-            
+
             document.getElementById('invoiceDate').value = date;
             document.getElementById('invoiceTime').value = time;
         }
@@ -450,21 +427,18 @@
                 total += productTotal;
 
                 if (productName && quantity > 0 && price > 0) {
-                    // Formatear línea de producto con espaciado exacto
                     const formattedPrice = formatCurrency(price);
                     const formattedTotal = formatCurrency(productTotal);
                     const quantityStr = quantity.toString();
-                    
+
                     productsHtml += `${productName}\n${quantityStr.padEnd(7)}${formattedPrice.padStart(11)}${formattedTotal.padStart(11)}\n\n`;
                 }
             }
 
-            // Calcular deuda total
             const totalDebt = previousDebt + total;
 
-            // Generar vista previa con formato exacto
             const preview = document.getElementById('invoicePreview');
-            preview.innerHTML = `${logoDataUrl ? `<div class="invoice-logo"><img src="${logoDataUrl}" alt="Logo"></div>` : ''}
+            preview.innerHTML = `<div class="invoice-logo"><img src="Logo.png" alt="Logo"></div>
 
 <strong>${businessName}</strong>
 ${address}
@@ -502,11 +476,9 @@ Deuda: ${formatCurrency(totalDebt)}
 
         // Nueva factura
         function newInvoice() {
-            // Incrementar número de ticket
             const currentNumber = parseInt(document.getElementById('ticketNumber').value) || 1;
             document.getElementById('ticketNumber').value = currentNumber + 1;
 
-            // Limpiar productos
             const container = document.getElementById('productsContainer');
             container.innerHTML = `
                 <div class="product-row">
@@ -518,14 +490,13 @@ Deuda: ${formatCurrency(totalDebt)}
                 </div>
             `;
 
-            // Actualizar fecha y hora
             setCurrentDateTime();
             updatePreview();
         }
 
-        // Inicializar
         setCurrentDateTime();
         updatePreview();
     </script>
 </body>
+
 </html>
