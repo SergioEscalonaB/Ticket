@@ -6,9 +6,9 @@
     <title>Generador de Facturas POS</title>
     <style>
         * {
+            font-family: monospace;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
@@ -210,7 +210,20 @@
             margin-bottom: 15px;
         }
 
+        /* Estilos de impresión mejorados para impresoras térmicas */
         @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                font-family: 'Courier New', monospace !important;
+            }
+            
             body * {
                 visibility: hidden;
             }
@@ -220,14 +233,52 @@
             }
             
             .invoice-preview {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 58mm;
-                margin: 0;
-                padding: 2mm;
-                font-size: 11.5px;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 58mm !important;
+                max-width: 58mm !important;
+                margin: 0 !important;
+                padding: 1mm !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: white !important;
+                font-size: 11px !important;
+                line-height: 1.2 !important;
+                color: black !important;
+                text-align: left !important;
             }
+            
+            .invoice-preview img {
+                max-width: 50mm !important;
+                max-height: 15mm !important;
+                display: block !important;
+                margin: 0 auto 2mm auto !important;
+            }
+            
+            .invoice-preview strong {
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            /* Ocultar elementos innecesarios para impresión */
+            .print-buttons {
+                display: none !important;
+            }
+            
+            /* Asegurar que el texto no se corte */
+            .invoice-preview * {
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                overflow: visible !important;
+            }
+        }
+
+        /* Estilos adicionales para mejor compatibilidad con impresoras térmicas */
+        @page {
+            size: 58mm auto;
+            margin: 0;
+            padding: 0;
         }
     </style>
 </head>
